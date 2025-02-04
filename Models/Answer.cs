@@ -1,4 +1,7 @@
-﻿namespace QuestionnaireApi.Models
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace QuestionnaireApi.Models
 {
     public class Answer
     {
@@ -6,12 +9,13 @@
 
         public int QuestionId { get; set; }
 
-        public int AnswerType { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))] 
+        public AnswerType AnswerType { get; set; }
 
         public int OrderNumber { get; set; }
 
         public Texts Texts { get; set; }
 
-        public int ItemType { get; set; }
+        public ItemType ItemType { get; set; }
     }
 }

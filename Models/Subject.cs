@@ -11,7 +11,7 @@ namespace QuestionnaireApi.Models
 
         public Texts Texts { get; set; }
 
-        public int ItemType { get; set; }
+        public ItemType ItemType { get; set; }
 
         [JsonProperty("questionnaireItems")]
         public IEnumerable<Question> Questions { get; set; }
