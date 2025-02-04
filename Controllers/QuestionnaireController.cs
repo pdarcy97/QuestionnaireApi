@@ -79,7 +79,7 @@ namespace QuestionnaireApi.Controllers
         //}
 
         [HttpPost]
-        public async Task<IActionResult> SubmitQuestionnaire([FromBody] SubmitQuestionnaireRequest request)
+        public Task<IActionResult> SubmitQuestionnaire([FromBody] SubmitQuestionnaireRequest request)
         {
             responseService.AddResponse(
                 new QuestionnaireResponse
@@ -93,7 +93,7 @@ namespace QuestionnaireApi.Controllers
 
             var newResults = responseService.GetResponses();
 
-            return new OkObjectResult(newResults);
+            return Task.FromResult<IActionResult>(new OkObjectResult(newResults));
 
             int CalculateOverallScore(IEnumerable<QuestionResponse> questionResponses)
             {
@@ -119,14 +119,14 @@ namespace QuestionnaireApi.Controllers
 
             var responses = responseService.GetResponses();
 
-            foreach (var questionnaireResponse in responses.QuestionnaireResponses)
+            foreach (var questionnaireResponse in responses)
             {
                 foreach (var questionResponse in questionnaireResponse.QuestionResponses)
                 {
                     var result = results.FirstOrDefault(r => r.QuestionId == questionResponse.QuestionId);
 
                     if (result == null) continue;
-                    if (questionResponse.Score < result.Min)
+                    if (questionResponse.Score < int.MaxValue)
                     {
                         result.Min = questionResponse.Score;
                     }
@@ -137,6 +137,7 @@ namespace QuestionnaireApi.Controllers
                     }
 
                     result.TotalScore += questionResponse.Score;
+                    result.Responses++;
                 }
             }
 
