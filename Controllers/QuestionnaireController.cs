@@ -38,51 +38,14 @@ namespace QuestionnaireApi.Controllers
             return new OkObjectResult(paginatedQuestions);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> AddAnswerToQuestion([FromBody] AddAnswersRequest request)
-        //{
-        //    var questionnaireResponse = await File.ReadAllTextAsync("Data/questionnaire.json", System.Text.Encoding.UTF8);
-        //    var questionnaire = JsonConvert.DeserializeObject<Questionnaire>(questionnaireResponse);
-
-        //    if (questionnaire == null) return new BadRequestObjectResult("No questionnaire file found");
-
-        //    foreach (var subject in questionnaire.Subjects)
-        //    {
-        //        foreach (var question in subject.Questions)
-        //        {
-        //            if (question.QuestionId != request.QuestionId) continue;
-                    
-        //            var i = 0;
-        //            foreach (var value in request.Answers)
-        //            {
-        //                var answer = new { i = i++, value };
-        //                question.Answers = question.Answers.Concat([
-        //                    new Answer
-        //                    {
-        //                        AnswerId = answer.i,
-        //                        AnswerType = AnswerType.Option,
-        //                        ItemType = ItemType.Answer,
-        //                        OrderNumber = answer.i,
-        //                        QuestionId = request.QuestionId,
-        //                        Texts = answer.value
-        //                    }
-        //                ]);
-        //            }
-        //        }
-        //    }
-
-        //    await File.WriteAllTextAsync("Data/questionnaire.json", JsonConvert.SerializeObject(questionnaire));
-        //    return new OkObjectResult(questionnaire);
-        //}
-
         [HttpPost]
         public Task<IActionResult> SubmitQuestionnaire([FromBody] SubmitQuestionnaireRequest request)
         {
             responseService.AddResponse(
                 new QuestionnaireResponse
                 {
-                    Department = request.Department,
                     UserId = request.UserId,
+                    Department = request.Department,
                     QuestionResponses = request.QuestionResponses,
                     OverallScore = CalculateOverallScore(request.QuestionResponses)
                 }
@@ -141,24 +104,19 @@ namespace QuestionnaireApi.Controllers
             return new OkObjectResult(results);
         }
 
-        private IEnumerable<QuestionScores> InitializeQuestionScores(Questionnaire questionnaire)
+        private static IEnumerable<QuestionScores> InitializeQuestionScores(Questionnaire questionnaire)
         {
             List<QuestionScores> questionScores = [];
-
-            foreach (var subject in questionnaire.Subjects)
+            questionScores.AddRange(from subject in questionnaire.Subjects
+            from question in subject.Questions
+            select new QuestionScores
             {
-                foreach (var question in subject.Questions)
-                {
-                    questionScores.Add(new QuestionScores
-                    {
-                        QuestionId = question.QuestionId,
-                        Max = 0,
-                        Min = 0,
-                        Responses = 0,
-                        TotalScore = 0,
-                    });
-                }
-            }
+                QuestionId = question.QuestionId,
+                Max = 0,
+                Min = 0,
+                Responses = 0,
+                TotalScore = 0,
+            });
 
             return questionScores;
         }

@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.CompilerServices;
-
-namespace QuestionnaireApi.Models
+﻿namespace QuestionnaireApi.Models
 {
     public class QuestionScores
     {
