@@ -20,7 +20,7 @@ namespace QuestionnaireApi.Controllers
 
         [HttpGet]
         [Route("{subjectId}")]
-        public async Task<IActionResult> GetQuestionsForSubject(int subjectId)
+        public async Task<IActionResult> GetQuestionsForSubject(int subjectId, int pageNumber = 1, int pageSize = 1)
         {
             var questionnaireResponse = await File.ReadAllTextAsync("Data/questionnaire.json", System.Text.Encoding.UTF8);
             
@@ -29,16 +29,13 @@ namespace QuestionnaireApi.Controllers
             if (questionnaire == null) return new BadRequestObjectResult("No questionnaire file found");
             var subject = questionnaire.Subjects.FirstOrDefault(s => s.SubjectId == subjectId);
 
-            if (subject == null) return new BadRequestObjectResult("No questionnaire file found");
-            const int pageNumber = 1;
-            const int pageSize = 10;
+            if (subject == null) return new BadRequestObjectResult("Subject not found");
 
             var paginatedQuestions = subject.Questions.Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
             return new OkObjectResult(paginatedQuestions);
-
         }
 
         //[HttpPost]
